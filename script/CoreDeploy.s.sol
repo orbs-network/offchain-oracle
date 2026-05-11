@@ -31,8 +31,8 @@ abstract contract CoreDeploy is Script {
         _json = vm.readFile(CONFIG_PATH);
         cfg.chainKey = string.concat(".", vm.toString(block.chainid));
         cfg.index = vm.envOr("INDEX", uint256(0));
-        owner = vm.envAddress("OWNER");
-        require(owner != address(0), "missing OWNER env");
+        owner = vm.envAddress("ETH_FROM");
+        require(owner != address(0), "missing ETH_FROM env");
         weth = IERC20(vm.envAddress("WETH"));
         require(address(weth) != address(0), "missing WETH env");
 
