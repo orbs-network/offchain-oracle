@@ -1,8 +1,7 @@
 # Spot Price Aggregator
 
-This is a fork of the upstream 1inch Spot Price Aggregator. The original README is preserved at:
-
-- [`README.upstream.md`](./README.upstream.md)
+This is a fork of the upstream 1inch Spot Price Aggregator. This fork keeps the
+Solidity contracts, Foundry tests, and Foundry deployment scripts.
 
 ### Upstream sync note
 
