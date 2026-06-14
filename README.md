@@ -4,6 +4,15 @@ This is a fork of the upstream 1inch Spot Price Aggregator. The original README 
 
 - [`README.upstream.md`](./README.upstream.md)
 
+### Upstream sync note
+
+As of 2026-06-14, `oneinch/master` is 19 commits ahead of `origin/master`, while `origin/master` is 91 commits ahead of `oneinch/master`; shared base is `393e7b1`.
+
+1. Upstream added `OffchainOracle` oracle/token blacklist support plus blacklist-count gas optimization.
+2. Upstream added connector routing for `UniswapV4LikeOracle`.
+3. Upstream bumped `handlebars` to `4.7.9` and adjusted tests/fixtures.
+4. Future sync: re-check remotes first; not fast-forwarding now because value is low versus redeploying all chains.
+
 ### Configuration
 
 - [`config.json`](./config.json)
