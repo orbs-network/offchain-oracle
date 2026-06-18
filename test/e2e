@@ -1,0 +1,144 @@
+#!/usr/bin/env zsh
+set -euo pipefail
+
+repo_root=${0:A:h:h}
+script_path=${0:A}
+config_file=$repo_root/config.json
+tokens_file=$repo_root/test/fixtures/tokens.json
+native_token=0x0000000000000000000000000000000000000000
+min_sane_price=100000000000
+max_sane_price=1000000000000000000000000
+
+fail() {
+  print -u2 -- "$@"
+  exit 1
+}
+
+price() {
+  local oracle=$1 token=$2 rpc_url=$3
+  cast call --json "$oracle" 'usd(address)(uint256,uint8)' "$token" --rpc-url "$rpc_url"
+}
+
+decimal_less_than() {
+  local left=$1 right=$2
+
+  while [[ "$left" == 0* && "$left" != "0" ]]; do
+    left=${left#0}
+  done
+  while [[ "$right" == 0* && "$right" != "0" ]]; do
+    right=${right#0}
+  done
+
+  if [[ ${#left} -ne ${#right} ]]; then
+    [[ ${#left} -lt ${#right} ]]
+  else
+    [[ "$left" < "$right" ]]
+  fi
+}
+
+assert_price() {
+  local label=$1 raw=$2 price_value decimals_value
+  price_value=$(jq -r '.[0] | tostring' <<<"$raw")
+  decimals_value=$(jq -r '.[1] | tostring' <<<"$raw")
+
+  [[ "$price_value" == <-> ]] || fail "$label returned non-decimal price: $price_value"
+  [[ "$price_value" != "0" ]] || fail "$label returned zero price"
+  ! decimal_less_than "$price_value" "$min_sane_price" \
+    || fail "$label returned implausibly small price: $price_value"
+  ! decimal_less_than "$max_sane_price" "$price_value" \
+    || fail "$label returned implausibly large price: $price_value"
+  [[ "$decimals_value" == <-> ]] || fail "$label returned non-decimal token decimals: $decimals_value"
+  [[ "$decimals_value" -le 36 ]] || fail "$label returned implausible token decimals: $decimals_value"
+}
+
+base_assets() {
+  local chain_id=$1
+
+  chain "$chain_id" >/dev/null
+  [[ -n "${WETH:-}" ]] || fail "$chain_id missing WETH after chain"
+
+  print -- "$native_token"
+  print -- "$WETH"
+  jq -r --arg chain "$chain_id" '.[$chain].connectors // [] | .[]' "$config_file"
+}
+
+assert_static_config() {
+  jq -e '
+    type == "object"
+    and all(to_entries[]; (.value | type) == "array")
+    and all(to_entries[]; (.value | length) >= 3)
+    and all(to_entries[]; all(.value[]; test("^0x[0-9a-fA-F]{40}$")))
+    and all(to_entries[]; all(.value[]; ascii_downcase != "0x0000000000000000000000000000000000000000"))
+    and all(to_entries[]; (.value | map(ascii_downcase) | unique | length) == (.value | length))
+  ' "$tokens_file" >/dev/null || fail "invalid tokens fixture"
+
+  jq -e --slurpfile tokens "$tokens_file" '
+    all(
+      to_entries[] | select((.value.oracle // "") != "");
+      (.key as $chain | ($tokens[0][$chain] // []) | length >= 3)
+    )
+  ' "$config_file" >/dev/null || fail "active config chain missing 3 non-base tokens"
+}
+
+assert_non_base_tokens() {
+  local chain_id tokens overlap
+  for chain_id in ${(f)"$(jq -r 'keys[]' "$tokens_file")"}; do
+    tokens=$(jq -r --arg chain "$chain_id" '.[$chain][]' "$tokens_file" | tr '[:upper:]' '[:lower:]')
+    overlap=$(
+      base_assets "$chain_id" \
+        | tr '[:upper:]' '[:lower:]' \
+        | grep -Fx -f <(print -r -- "$tokens") || true
+    )
+    [[ -z "$overlap" ]] || fail "$chain_id tokens include WNATIVE/connectors/base assets:\n$overlap"
+  done
+}
+
+check_price() {
+  local kind=$1 chain_id=$2 oracle=$3 token=$4 raw
+
+  chain "$chain_id" >/dev/null
+  [[ -n "${ETH_RPC_URL:-}" ]] || fail "$chain_id missing ETH_RPC_URL after chain"
+
+  raw=$(price "$oracle" "$token" "$ETH_RPC_URL" 2>&1) \
+    || fail "$chain_id $kind $token reverted:\n$raw"
+  assert_price "$chain_id $kind $token" "$raw"
+  print -- "ok\t$kind\t$chain_id\t$token\t$(jq -r '.[0] | tostring' <<<"$raw")\t$(jq -r '.[1] | tostring' <<<"$raw")"
+}
+
+jobs() {
+  jq -r 'to_entries[] | select((.value.oracle // "") != "") | [.key, .value.oracle] | @tsv' "$config_file" \
+    | while IFS=$'\t' read -r chain_id oracle; do
+        base_assets "$chain_id" | while read -r token; do
+          print -- "base\t$chain_id\t$oracle\t$token"
+        done
+        jq -r --arg chain "$chain_id" --arg oracle "$oracle" \
+          '.[$chain][]? | ["token", $chain, $oracle, .] | @tsv' "$tokens_file"
+      done
+}
+
+run_all() {
+  assert_static_config
+  assert_non_base_tokens
+
+  jobs | parallel --line-buffer --colsep '\t' \
+    "$script_path --price {1} {2} {3} {4}"
+}
+
+case "${1:-}" in
+  --price)
+    check_price "$2" "$3" "$4" "$5"
+    ;;
+  *)
+    set +e
+    output=$(run_all 2>&1)
+    code=$?
+    set -e
+
+    if [[ $code -eq 0 ]]; then
+      print -- "OK"
+    else
+      print -- "e2e failed with exit $code"
+      print -r -- "$output" | awk '/^[0-9]+ (base|token) / { print }'
+    fi
+    ;;
+esac
