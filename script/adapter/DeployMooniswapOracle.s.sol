@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.23;
 
-import {CoreDeploy} from "script/CoreDeploy.s.sol";
+import {ConfigDeploy} from "script/ConfigDeploy.s.sol";
 import {OffchainOracle} from "contracts/OffchainOracle.sol";
 import {MooniswapOracle} from "contracts/oracles/MooniswapOracle.sol";
 import {IMooniswapFactory} from "contracts/interfaces/IMooniswapFactory.sol";
 
-contract DeployMooniswapOracle is CoreDeploy {
+contract DeployMooniswapOracle is ConfigDeploy {
     function run() external returns (MooniswapOracle oracle) {
         address factory = _adapterAddress("factory");
         require(factory != address(0), "missing factory");

@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.23;
 
-import {CoreDeploy} from "script/CoreDeploy.s.sol";
+import {ConfigDeploy} from "script/ConfigDeploy.s.sol";
 import {OffchainOracle} from "contracts/OffchainOracle.sol";
 import {FluidDexOracle, IFluidDexReservesResolver} from "contracts/oracles/FluidDexOracle.sol";
 
-contract DeployFluidDexOracle is CoreDeploy {
+contract DeployFluidDexOracle is ConfigDeploy {
     function run() external returns (FluidDexOracle oracle) {
         address resolver = _adapterAddress("resolver");
         require(resolver != address(0), "missing resolver");

@@ -7,7 +7,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {OffchainOracle} from "contracts/OffchainOracle.sol";
 import {IOracle} from "contracts/interfaces/IOracle.sol";
 
-abstract contract CoreDeploy is Script {
+abstract contract ConfigDeploy is Script {
     string internal constant CONFIG_PATH = "config.json";
     string internal _json;
 
@@ -107,6 +107,11 @@ abstract contract CoreDeploy is Script {
     function _envStringArray(string memory key) internal view returns (string[] memory arr) {
         string memory path = _envPath(key);
         return vm.keyExistsJson(_json, path) ? vm.parseJsonStringArray(_json, path) : new string[](0);
+    }
+
+    function _envUintArray(string memory key) internal view returns (uint256[] memory arr) {
+        string memory path = _envPath(key);
+        return vm.keyExistsJson(_json, path) ? vm.parseJsonUintArray(_json, path) : new uint256[](0);
     }
 
     function _envAddress(string memory key) internal view returns (address addr) {

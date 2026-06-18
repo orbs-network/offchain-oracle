@@ -2,10 +2,9 @@
 pragma solidity 0.8.23;
 
 import "forge-std/Test.sol";
-import {UsdOraclePyth, IPythOracle} from "contracts/view/UsdOraclePyth.sol";
+import {UsdOraclePyth} from "contracts/view/UsdOraclePyth.sol";
 import {UsdOracleCore} from "contracts/view/UsdOracleCore.sol";
-import {IOffchainOracleAggregator} from "contracts/view/AggregatorLib.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {MockOffchainOracleAggregator, MockPythOracle, MockToken} from "test/utils/UsdOracleMocks.sol";
 
 contract UsdOraclePythTest is Test {
     UsdOraclePyth public oracleUsd;
@@ -68,54 +67,5 @@ contract UsdOraclePythTest is Test {
         vm.warp(block.timestamp + 2 days);
         vm.expectRevert(abi.encodeWithSelector(UsdOracleCore.StaleAnswer.selector, address(0)));
         oracleUsd.usd(address(0));
-    }
-}
-
-contract MockOffchainOracleAggregator is IOffchainOracleAggregator {
-    uint256 public rateToEth;
-
-    function setRateToEth(uint256 _rateToEth) external {
-        rateToEth = _rateToEth;
-    }
-
-    function getRateWithThreshold(IERC20, IERC20, bool, uint256) external view returns (uint256 weightedRate) {
-        return rateToEth;
-    }
-}
-
-contract MockPythOracle is IPythOracle {
-    struct PriceData {
-        int64 price;
-        uint64 confidence;
-        int32 exponent;
-        uint256 updated;
-    }
-
-    mapping(bytes32 => PriceData) public prices;
-
-    function setPrice(bytes32 id, int64 price, uint64 confidence, int32 exponent, uint256 updated) external {
-        prices[id] = PriceData(price, confidence, exponent, updated);
-    }
-
-    function getPriceUnsafe(bytes32 id)
-        external
-        view
-        override
-        returns (int64 price, uint64 confidence, int32 exponent, uint256 updated)
-    {
-        PriceData memory data = prices[id];
-        return (data.price, data.confidence, data.exponent, data.updated);
-    }
-}
-
-contract MockToken {
-    uint8 private immutable _decimals;
-
-    constructor(uint8 d) {
-        _decimals = d;
-    }
-
-    function decimals() external view returns (uint8) {
-        return _decimals;
     }
 }

@@ -1,15 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.23;
 
-import {RpcUtils} from "test/utils/RpcUtils.sol";
+import {ConfigUtils} from "test/utils/ConfigUtils.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import {AlgebraCustomPoolOracle} from "contracts/oracles/AlgebraCustomPoolOracle.sol";
 
-contract AlgebraCustomPoolOracleBscTest is RpcUtils {
-    IERC20 private constant NONE = IERC20(0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF);
-
-    string private constant CONFIG_PATH = "config.json";
+contract AlgebraCustomPoolOracleBscTest is ConfigUtils {
     string private constant CHAIN_KEY = ".56";
 
     IERC20 private constant WBNB = IERC20(0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c);
@@ -27,8 +24,10 @@ contract AlgebraCustomPoolOracleBscTest is RpcUtils {
         vm.createSelectFork(_rpcUrl("bnb"));
 
         string memory json = vm.readFile(CONFIG_PATH);
-        thenaV3Oracle = vm.parseJsonAddress(json, string.concat(CHAIN_KEY, ".adapters[7].env.address"));
-        thenaV3FeeOnlyOracle = vm.parseJsonAddress(json, string.concat(CHAIN_KEY, ".adapters[8].env.address"));
+        thenaV3Oracle =
+            vm.parseJsonAddress(json, string.concat(_adapterPathByLabel(json, CHAIN_KEY, "ThenaV3"), ".env.address"));
+        thenaV3FeeOnlyOracle =
+            vm.parseJsonAddress(json, string.concat(_adapterPathByLabel(json, CHAIN_KEY, "ThenaV3-2"), ".env.address"));
     }
 
     function test_thenaV3_resolvesPools() public view {

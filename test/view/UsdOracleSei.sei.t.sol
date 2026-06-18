@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.23;
 
-import {RpcUtils} from "test/utils/RpcUtils.sol";
+import {ConfigUtils} from "test/utils/ConfigUtils.sol";
 import {UsdOracleSei, ISeiPrecompile} from "contracts/view/UsdOracleSei.sol";
 import {UsdOracleCore} from "contracts/view/UsdOracleCore.sol";
 
-contract UsdOracleSeiTest is RpcUtils {
+contract UsdOracleSeiTest is ConfigUtils {
     UsdOracleSei public oracleSei;
 
     address private constant WBASE = 0xE30feDd158A2e3b13e9badaeABaFc5516e95e8C7;
@@ -19,24 +19,19 @@ contract UsdOracleSeiTest is RpcUtils {
     address public wsei;
 
     function setUp() public {
-        string memory json = vm.readFile("config.json");
-        string memory chainKey = ".1329";
+        string memory json = vm.readFile(CONFIG_PATH);
+        string memory chainKey = _chainPath("1329");
         string memory aggregatorRaw = vm.parseJsonString(json, string.concat(chainKey, ".aggregator"));
         require(bytes(aggregatorRaw).length != 0, "missing aggregator for chain 1329");
-        address[] memory deployTokens = vm.parseJsonAddressArray(json, string.concat(chainKey, ".connectors"));
+        address[] memory deployConnectors = _configConnectors(json, chainKey);
         string[] memory deployDenoms = vm.parseJsonStringArray(json, string.concat(chainKey, ".env.denoms"));
         aggregator = vm.parseJsonAddress(json, string.concat(chainKey, ".aggregator"));
         require(aggregator != address(0), "aggregator is zero for chain 1329");
-        require(deployTokens.length >= 4, "connectors length < 4");
-        require(deployDenoms.length == deployTokens.length + 2, "denoms length must be connectors+2");
+        require(deployConnectors.length >= 4, "connectors length < 4");
+        require(deployDenoms.length == deployConnectors.length + 2, "denoms length must be connectors+2");
 
-        address[] memory tokens = new address[](deployTokens.length + 2);
+        address[] memory tokens = _runtimeTokens(json, chainKey, WBASE);
         string[] memory denoms = deployDenoms;
-        tokens[0] = address(0);
-        tokens[1] = WBASE;
-        for (uint256 i = 0; i < deployTokens.length; i++) {
-            tokens[i + 2] = deployTokens[i];
-        }
 
         sei = tokens[0];
         wsei = tokens[1];
@@ -59,8 +54,11 @@ contract UsdOracleSeiTest is RpcUtils {
 
         address seiPrecompile = address(oracleSei.SEI_PRECOMPILE());
         bytes memory callData = abi.encodeWithSelector(ISeiPrecompile.getExchangeRates.selector);
-        bytes memory rawRates = _fetchRates(seiPrecompile, callData);
-        vm.mockCall(seiPrecompile, callData, rawRates);
+        try this.fetchRates(seiPrecompile, callData) returns (bytes memory rawRates) {
+            vm.mockCall(seiPrecompile, callData, rawRates);
+        } catch {
+            vm.skip(true, "Sei oracle precompile rates unavailable");
+        }
     }
 
     function testUsd_usdc() public view {
@@ -127,5 +125,9 @@ contract UsdOracleSeiTest is RpcUtils {
         } else {
             raw = resp;
         }
+    }
+
+    function fetchRates(address precompile, bytes memory callData) external returns (bytes memory raw) {
+        return _fetchRates(precompile, callData);
     }
 }

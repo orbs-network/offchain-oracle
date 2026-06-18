@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.23;
 
-import {CoreDeploy} from "script/CoreDeploy.s.sol";
+import {ConfigDeploy} from "script/ConfigDeploy.s.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {OffchainOracle} from "contracts/OffchainOracle.sol";
 import {MultiWrapper} from "contracts/MultiWrapper.sol";
@@ -9,7 +9,7 @@ import {IOracle} from "contracts/interfaces/IOracle.sol";
 import {IWrapper} from "contracts/interfaces/IWrapper.sol";
 import {BaseCoinWrapper} from "contracts/wrappers/BaseCoinWrapper.sol";
 
-contract DeployAggregator is CoreDeploy {
+contract DeployAggregator is ConfigDeploy {
     IERC20 private constant _NONE = IERC20(0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF);
     IERC20 private constant _NATIVE = IERC20(0x0000000000000000000000000000000000000000);
 

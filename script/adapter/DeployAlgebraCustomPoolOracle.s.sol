@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.23;
 
-import {CoreDeploy} from "script/CoreDeploy.s.sol";
+import {ConfigDeploy} from "script/ConfigDeploy.s.sol";
 import {OffchainOracle} from "contracts/OffchainOracle.sol";
 import {AlgebraCustomPoolOracle} from "contracts/oracles/AlgebraCustomPoolOracle.sol";
 
-contract DeployAlgebraCustomPoolOracle is CoreDeploy {
+contract DeployAlgebraCustomPoolOracle is ConfigDeploy {
     function run() external returns (AlgebraCustomPoolOracle oracle) {
         address poolDeployer = _adapterAddress("poolDeployer");
         address customDeployer = _adapterAddress("customDeployer");

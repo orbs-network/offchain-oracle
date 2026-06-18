@@ -1,15 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.23;
 
-import {RpcUtils} from "test/utils/RpcUtils.sol";
+import {ConfigUtils} from "test/utils/ConfigUtils.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import {AlgebraOracle} from "contracts/oracles/AlgebraOracle.sol";
 import {AlgebraCustomPoolOracle} from "contracts/oracles/AlgebraCustomPoolOracle.sol";
 
-contract AlgebraCustomPoolOracleAvaxTest is RpcUtils {
-    IERC20 private constant NONE = IERC20(0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF);
-    string private constant CONFIG_PATH = "config.json";
+contract AlgebraCustomPoolOracleAvaxTest is ConfigUtils {
     string private constant CHAIN_KEY = ".43114";
 
     address private poolDeployer;
@@ -22,13 +20,14 @@ contract AlgebraCustomPoolOracleAvaxTest is RpcUtils {
         vm.createSelectFork(_rpcUrl("avax"));
 
         string memory json = vm.readFile(CONFIG_PATH);
-        poolDeployer = vm.parseJsonAddress(json, string.concat(CHAIN_KEY, ".adapters[10].env.poolDeployer"));
-        cl50Deployer = vm.parseJsonAddress(json, string.concat(CHAIN_KEY, ".adapters[10].env.customDeployer"));
-        initcodeHash = vm.parseJsonBytes32(json, string.concat(CHAIN_KEY, ".adapters[10].env.initcodehash"));
+        string memory adapterPath = _adapterPathByLabel(json, CHAIN_KEY, "BlackholeCL50");
+        poolDeployer = vm.parseJsonAddress(json, string.concat(adapterPath, ".env.poolDeployer"));
+        cl50Deployer = vm.parseJsonAddress(json, string.concat(adapterPath, ".env.customDeployer"));
+        initcodeHash = vm.parseJsonBytes32(json, string.concat(adapterPath, ".env.initcodehash"));
 
-        address[] memory connectors = vm.parseJsonAddressArray(json, string.concat(CHAIN_KEY, ".connectors"));
-        require(connectors.length >= 5, "connectors length < 5");
-        usdc = IERC20(connectors[4]);
+        address[] memory connectors = _configConnectors(json, CHAIN_KEY);
+        require(connectors.length >= 2, "connectors length < 2");
+        usdc = IERC20(connectors[1]);
         wavax = IERC20(0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7);
     }
 

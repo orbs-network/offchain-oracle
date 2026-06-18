@@ -81,11 +81,7 @@ contract FluidDexOracle is IOracle {
         weight = Math.min(weight0, weight1);
     }
 
-    function _getBestPrice(address tokenA, address tokenB)
-        internal
-        view
-        returns (uint256 price1e27, uint256 weight)
-    {
+    function _getBestPrice(address tokenA, address tokenB) internal view returns (uint256 price1e27, uint256 weight) {
         uint256 totalPools = RESOLVER.getTotalPools();
         for (uint256 i = 1; i <= totalPools; i++) {
             address pool = RESOLVER.getPoolAddress(i);

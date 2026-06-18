@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.23;
 
-import {CoreDeploy} from "script/CoreDeploy.s.sol";
+import {ConfigDeploy} from "script/ConfigDeploy.s.sol";
 import {OffchainOracle} from "contracts/OffchainOracle.sol";
 import {UniswapOracle} from "contracts/oracles/UniswapOracle.sol";
 import {IUniswapFactory} from "contracts/interfaces/IUniswapFactory.sol";
 
-contract DeployUniswapOracle is CoreDeploy {
+contract DeployUniswapOracle is ConfigDeploy {
     function run() external returns (UniswapOracle oracle) {
         address factory = _adapterAddress("factory");
         require(factory != address(0), "missing factory");

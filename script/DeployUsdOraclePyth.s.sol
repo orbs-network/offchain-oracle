@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.23;
 
-import {CoreDeploy} from "script/CoreDeploy.s.sol";
+import {ConfigDeploy} from "script/ConfigDeploy.s.sol";
 import {UsdOraclePyth} from "contracts/view/UsdOraclePyth.sol";
 
-contract DeployUsdOraclePyth is CoreDeploy {
+contract DeployUsdOraclePyth is ConfigDeploy {
     function run() external returns (UsdOraclePyth oracle) {
         address[] memory tokens = _tokens();
         address pythAddr = _envAddress("pyth");

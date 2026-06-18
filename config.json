@@ -188,7 +188,7 @@
                 "label": "Pancake",
                 "name": "UniswapV3LikeOracle",
                 "env": {
-                    "factory": "0x0BFbCF9fa4f9C56B0F40a671Ad40E0805A091865",
+                    "factory": "0x41ff9AA7e16B8B1a8a8dc4f0eFacd93D02d071c9",
                     "initcodehash": "0x6ce8eb472fa82df5469c6ab6d485f17c3ad13c8cd7af59b3d4a8026c5ce0f7e2",
                     "fees": [
                         100,
@@ -196,7 +196,7 @@
                         2500,
                         10000
                     ],
-                    "address": "0x937a002dd50452ffeb4f9c690556043a67b132B5"
+                    "address": "0xEbA3EaC6a60B91b8B82C15c4eB941aEF2dAF686b"
                 }
             }
         ]
@@ -262,6 +262,44 @@
                         10000
                     ],
                     "address": "0x5C9CD8294F6079698df4C333dF6b38Aa23D8e04a"
+                }
+            }
+        ]
+    },
+    "999": {
+        "connectors": [
+            "0xb88339CB7199b77E23DB6E890353E22632Ba630f",
+            "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb",
+            "0x111111a1a0667d36bd57c0a9f569b98057111111",
+            "0x9fdbda0a5e284c32744d2f17ee5c74b284993463",
+            "0xbe6727b535545c67d5caa73dea54865b92cf7907"
+        ],
+        "adapters": [
+            {
+                "label": "Project X",
+                "name": "UniswapV3LikeOracle",
+                "env": {
+                    "factory": "0xFf7B3e8C00e57ea31477c32A5B52a58Eea47b072",
+                    "initcodehash": "0x7ef2b01a451cbf890790278981756372e549443802ece149dc0b592cbc114ee9",
+                    "fees": [
+                        100,
+                        200,
+                        500,
+                        1000,
+                        3000,
+                        10000,
+                        20000
+                    ],
+                    "address": "0x96aCfBBDB553c57089Db16037cbfE0e6BA87a11e"
+                }
+            },
+            {
+                "label": "Nest",
+                "name": "AlgebraCustomPoolOracle",
+                "env": {
+                    "poolDeployer": "0x3842CE04380B8655A3A47Ed87eA0D311ADCa161F",
+                    "initcodehash": "0xe4894f29e2491e531db85584561de8b8869774d41313c860cf4089d80a51d8a4",
+                    "address": "0xc7B5F5bF8659c745b107334A4eaaca531bA3edCe"
                 }
             }
         ]
@@ -362,16 +400,6 @@
                     "customDeployer": "0x58b05074D52D1a84D8FfDAddA3c1b652e8C56994",
                     "initcodehash": "0xeaa3eea3233916c82fe1281a51bd9cde844b7c4673c0714ca0028a57f5634752",
                     "address": "0xF8fd8d3409b6685d663498D9D501062D0Cf5cD61"
-                }
-            },
-            {
-                "label": "BlackholeCL100",
-                "name": "AlgebraCustomPoolOracle",
-                "env": {
-                    "poolDeployer": "0x9B2441037E286d5Bf9456a3BE7b5273fe28DbA1e",
-                    "customDeployer": "0xf9221dE143A0E57c324bF2a0f281e605e845D767",
-                    "initcodehash": "0xeaa3eea3233916c82fe1281a51bd9cde844b7c4673c0714ca0028a57f5634752",
-                    "address": "0x093111cb9D868e74fE71385592cd939Af8f77714"
                 }
             },
             {
@@ -864,23 +892,6 @@
                 }
             },
             {
-                "label": "Etherex V3",
-                "name": "UniswapV3LikeOracle",
-                "env": {
-                    "factory": "0xAe334f70A7FC44FCC2df9e6A37BC032497Cf80f1",
-                    "initcodehash": "0xd016d9e5e63d722a7852248b4ed8d907ef88e028d8022c66201001ee406052eb",
-                    "fees": [
-                        1,
-                        5,
-                        10,
-                        50,
-                        100,
-                        200
-                    ],
-                    "address": "0xBD0202055d6B495E55524EaD40Cf4a40cDbBC4eB"
-                }
-            },
-            {
                 "label": "NILE",
                 "name": "UniswapV3LikeOracle",
                 "env": {
@@ -1205,14 +1216,22 @@
                 "name": "UniswapV3LikeOracle",
                 "env": {
                     "factory": "0xbACEB8eC6b9355Dfc0269C18bac9d6E2Bdc29C4F",
-                    "initcodehash": "0x6a8bdcb32a3bbb4f0957245e1b2f7afbe21296c833d5c0d517a12e018f3c33d8",
+                    "initcodehash": "0xe34f199b19b2b4f47f68442619d555527d244f78a3297ea89325f843f87b8b54",
                     "fees": [
                         100,
                         500,
                         3000,
                         10000
                     ],
-                    "address": "0x96d135611A2344271a268C58CF98DA39f336Ac34"
+                    "address": "0x2a012Ada9b0180e18496dd51f79081475B23FF19"
+                }
+            },
+            {
+                "label": "Frax Swap",
+                "name": "V2FactoryLookupOracle",
+                "env": {
+                    "factory": "0x43eC799eAdd63848443E2347C49f5f52e8Fe0F6f",
+                    "address": "0x1160D2e843b09b4161Be55E6FCc744FaCdd6Cc12"
                 }
             },
             {
@@ -1236,15 +1255,6 @@
                     "factory": "0xBAe5dc9B19004883d0377419FeF3c2C8832d7d7B",
                     "initcodehash": "0xe2200989b6f9506f3beca7e9c844741b3ad1a88ad978b6b0973e96d3ca4707aa",
                     "address": "0xe9bEC04a803C58f16564b8754ADD0F2797f34382"
-                }
-            },
-            {
-                "label": "Frax Swap",
-                "name": "UniswapV2LikeOracle",
-                "env": {
-                    "factory": "0x43eC799eAdd63848443E2347C49f5f52e8Fe0F6f",
-                    "initcodehash": "0xad51f1796a962669995519b0f93a5ccf2f9e43987d481bafcb0f417a51750049",
-                    "address": "0xfB7e360DCcAc525cEa5BD3ea3cC9bD4D0186d825"
                 }
             }
         ],

@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.23;
 
-import {CoreDeploy} from "script/CoreDeploy.s.sol";
+import {ConfigDeploy} from "script/ConfigDeploy.s.sol";
 import {UsdOracleSei} from "contracts/view/UsdOracleSei.sol";
 
-contract DeployUsdOracleSei is CoreDeploy {
+contract DeployUsdOracleSei is ConfigDeploy {
     function run() external returns (UsdOracleSei oracle) {
         address[] memory tokens = _tokens();
         string[] memory denoms = _envStringArray("denoms");

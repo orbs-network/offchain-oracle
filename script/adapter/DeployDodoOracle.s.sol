@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.23;
 
-import {CoreDeploy} from "script/CoreDeploy.s.sol";
+import {ConfigDeploy} from "script/ConfigDeploy.s.sol";
 import {OffchainOracle} from "contracts/OffchainOracle.sol";
 import {DodoOracle} from "contracts/oracles/DodoOracle.sol";
 import {IDodoZoo} from "contracts/interfaces/IDodoFactories.sol";
 
-contract DeployDodoOracle is CoreDeploy {
+contract DeployDodoOracle is ConfigDeploy {
     function run() external returns (DodoOracle oracle) {
         address zoo = _adapterAddress("zoo");
         require(zoo != address(0), "missing zoo");

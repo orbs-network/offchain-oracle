@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.23;
 
-import {CoreDeploy} from "script/CoreDeploy.s.sol";
+import {ConfigDeploy} from "script/ConfigDeploy.s.sol";
 import {OffchainOracle} from "contracts/OffchainOracle.sol";
 import {CurveOracleCRP} from "contracts/oracles/CurveOracleCRP.sol";
 import {ICurveProvider} from "contracts/interfaces/ICurveProvider.sol";
 
-contract DeployCurveOracleCRP is CoreDeploy {
+contract DeployCurveOracleCRP is ConfigDeploy {
     function run() external returns (CurveOracleCRP oracle) {
         address provider = _adapterAddress("provider");
         uint256 maxPools = _adapterUint("maxpools");

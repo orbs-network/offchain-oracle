@@ -2,10 +2,9 @@
 pragma solidity 0.8.23;
 
 import "forge-std/Test.sol";
-import {UsdOracle, IChainlinkAggregatorV3} from "contracts/view/UsdOracle.sol";
+import {UsdOracle} from "contracts/view/UsdOracle.sol";
 import {UsdOracleCore} from "contracts/view/UsdOracleCore.sol";
-import {IOffchainOracleAggregator} from "contracts/view/AggregatorLib.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {MockAggregatorV3, MockOffchainOracleAggregator, MockToken} from "test/utils/UsdOracleMocks.sol";
 
 contract UsdOracleTest is Test {
     UsdOracle public oracleUsd;
@@ -70,51 +69,3 @@ contract UsdOracleTest is Test {
         oracleUsd.usd(address(0));
     }
 }
-
-contract MockOffchainOracleAggregator is IOffchainOracleAggregator {
-    uint256 public rateToEth;
-
-    function setRateToEth(uint256 _rateToEth) external {
-        rateToEth = _rateToEth;
-    }
-
-    function getRateWithThreshold(IERC20, IERC20, bool, uint256) external view returns (uint256 weightedRate) {
-        return rateToEth;
-    }
-}
-
-contract MockAggregatorV3 is IChainlinkAggregatorV3 {
-    uint8 public override decimals;
-    int256 public answer;
-    uint256 public updated;
-
-    function setDecimals(uint8 d) external {
-        decimals = d;
-    }
-
-    function setAnswer(int256 a, uint256 t) external {
-        answer = a;
-        updated = t;
-    }
-
-    function latestRoundData()
-        external
-        view
-        override
-        returns (uint80 roundId, int256 _answer, uint256 startedAt, uint256 _updated, uint80 answeredInRound)
-    {
-        return (1, answer, updated, updated, 1);
-    }
-}
-
-    contract MockToken {
-        uint8 private immutable _decimals;
-
-        constructor(uint8 d) {
-            _decimals = d;
-        }
-
-        function decimals() external view returns (uint8) {
-            return _decimals;
-        }
-    }

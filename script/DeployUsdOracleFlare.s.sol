@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.23;
 
-import {CoreDeploy} from "script/CoreDeploy.s.sol";
+import {ConfigDeploy} from "script/ConfigDeploy.s.sol";
 import {UsdOracleFlare} from "contracts/view/UsdOracleFlare.sol";
 
-contract DeployUsdOracleFlare is CoreDeploy {
+contract DeployUsdOracleFlare is ConfigDeploy {
     function run() external returns (UsdOracleFlare oracle) {
         address[] memory tokens = _tokens();
         bytes32[] memory ftsos = _envBytes32Array("ftso");

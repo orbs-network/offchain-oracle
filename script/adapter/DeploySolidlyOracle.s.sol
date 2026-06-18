@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.23;
 
-import {CoreDeploy} from "script/CoreDeploy.s.sol";
+import {ConfigDeploy} from "script/ConfigDeploy.s.sol";
 import {OffchainOracle} from "contracts/OffchainOracle.sol";
 import {SolidlyOracle} from "contracts/oracles/SolidlyOracle.sol";
 
-contract DeploySolidlyOracle is CoreDeploy {
+contract DeploySolidlyOracle is ConfigDeploy {
     function run() external returns (SolidlyOracle oracle) {
         address factory = _adapterAddress("factory");
         bytes32 initcodehash = _adapterBytes32("initcodehash");

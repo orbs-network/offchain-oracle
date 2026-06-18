@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.23;
 
-import {CoreDeploy} from "script/CoreDeploy.s.sol";
+import {ConfigDeploy} from "script/ConfigDeploy.s.sol";
 import {OffchainOracle} from "contracts/OffchainOracle.sol";
 import {UniswapV4LikeOracle} from "contracts/oracles/UniswapV4LikeOracle.sol";
 import {IUniswapV4StateView} from "contracts/interfaces/IUniswapV4StateView.sol";
 
-contract DeployUniswapV4LikeOracle is CoreDeploy {
+contract DeployUniswapV4LikeOracle is ConfigDeploy {
     function run() external returns (UniswapV4LikeOracle oracle) {
         address stateView = _adapterAddress("stateview");
         uint256[] memory fees = _adapterUintArray("fees");

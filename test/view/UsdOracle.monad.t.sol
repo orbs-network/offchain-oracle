@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.23;
 
-import {RpcUtils} from "test/utils/RpcUtils.sol";
+import {ConfigUtils} from "test/utils/ConfigUtils.sol";
 import {UsdOracle} from "contracts/view/UsdOracle.sol";
 
-contract UsdOracleMonadTest is RpcUtils {
+contract UsdOracleMonadTest is ConfigUtils {
     UsdOracle public oracle;
 
     address private constant WBASE = 0x3bd359C1119dA7Da1D913D1C4D2B7c461115433A;
@@ -17,30 +17,25 @@ contract UsdOracleMonadTest is RpcUtils {
     function setUp() public {
         vm.createSelectFork(_rpcUrl("monad"));
 
-        string memory json = vm.readFile("config.json");
-        string memory chainKey = ".143";
+        string memory json = vm.readFile(CONFIG_PATH);
+        string memory chainKey = _chainPath("143");
         string memory aggregatorRaw = vm.parseJsonString(json, string.concat(chainKey, ".aggregator"));
         require(bytes(aggregatorRaw).length != 0, "missing aggregator for chain 143");
         address aggregator = vm.parseJsonAddress(json, string.concat(chainKey, ".aggregator"));
         require(aggregator != address(0), "aggregator is zero for chain 143");
-        address[] memory tokens = vm.parseJsonAddressArray(json, string.concat(chainKey, ".connectors"));
+        address[] memory connectors = _configConnectors(json, chainKey);
         address[] memory feeds = vm.parseJsonAddressArray(json, string.concat(chainKey, ".env.feeds"));
-        require(tokens.length >= 4, "connectors length < 4");
-        require(feeds.length == tokens.length + 2, "feeds length must be connectors+2");
+        require(connectors.length >= 4, "connectors length < 4");
+        require(feeds.length == connectors.length + 2, "feeds length must be connectors+2");
 
-        address[] memory deployTokens = new address[](tokens.length + 2);
-        deployTokens[0] = address(0);
-        deployTokens[1] = WBASE;
-        for (uint256 i = 0; i < tokens.length; i++) {
-            deployTokens[i + 2] = tokens[i];
-        }
+        address[] memory deployTokens = _runtimeTokens(json, chainKey, WBASE);
 
         oracle = new UsdOracle(aggregator, deployTokens, feeds);
 
-        weth = tokens[0];
-        usdt = tokens[1];
-        usdc = tokens[2];
-        wbtc = tokens[3];
+        weth = connectors[0];
+        usdt = connectors[1];
+        usdc = connectors[2];
+        wbtc = connectors[3];
     }
 
     function testUsd_usdc() public view {
