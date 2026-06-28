@@ -3,9 +3,10 @@ set -euo pipefail
 
 repo_root=${0:A:h:h}
 script_path=${0:A}
-config_file=$repo_root/config.json
+config_file=${CONFIG_FILE:-$repo_root/config.json}
 tokens_file=$repo_root/test/fixtures/tokens.json
 native_token=0x0000000000000000000000000000000000000000
+none_token=0xFFfFfFffFFfffFFfFFfFFFFFffFFFffffFfFFFfF
 min_sane_price=100000000000
 max_sane_price=1000000000000000000000000
 
@@ -143,6 +144,143 @@ assert_non_base_tokens() {
   done
 }
 
+assert_config_rules() {
+  local errors chain_id overlap
+
+  errors=$(
+    jq -r --arg native "$native_token" --arg none "$none_token" '
+      def feed_keys: ["feeds", "pyths", "api3s", "ftso"];
+      def feed_fields($env): [feed_keys[] as $key | select((($env[$key] // []) | length) > 0) | $key];
+      def selected_feed($env):
+        if (($env.pyths // []) | length) > 0 then $env.pyths
+        elif (($env.ftso // []) | length) > 0 then $env.ftso
+        elif (($env.api3s // []) | length) > 0 then $env.api3s
+        elif (($env.feeds // []) | length) > 0 then $env.feeds
+        else []
+        end;
+
+      [
+        to_entries[] as $entry
+        | ($entry.key) as $chain
+        | ($entry.value) as $cfg
+        | ($cfg.connectors // []) as $connectors
+        | ($cfg.env // {}) as $env
+        | feed_fields($env) as $feed_fields
+        | if ($env | has("tokens")) then "\($chain) env.tokens must not be set" else empty end,
+          if (($connectors | map(ascii_downcase) | unique | length) != ($connectors | length)) then "\($chain) connectors contain duplicates" else empty end,
+          ($connectors[]? | select((ascii_downcase == ($native | ascii_downcase)) or (ascii_downcase == ($none | ascii_downcase))) | "\($chain) connectors include native or NONE: \(.)"),
+          if (($cfg.oracle // "") != "" and ($feed_fields | length) != 1) then "\($chain) must set exactly one env feed array" else empty end,
+          if (($feed_fields | length) > 1) then "\($chain) sets multiple env feed arrays: \($feed_fields | join(", "))" else empty end,
+          if (($feed_fields | length) == 1 and ((selected_feed($env) | length) != (($connectors | length) + 2))) then "\($chain) env.\($feed_fields[0]) length \(selected_feed($env) | length) != connectors+2 \(($connectors | length) + 2)" else empty end,
+          if (($feed_fields == ["pyths"]) and (($env.pyth // $native | ascii_downcase) == ($native | ascii_downcase))) then "\($chain) env.pyth must be non-zero when env.pyths is set" else empty end,
+          if (($feed_fields == ["pyths"]) and any($env.pyths[]?; ascii_downcase == "0x0000000000000000000000000000000000000000000000000000000000000000")) then "\($chain) env.pyths contains zero bytes32" else empty end,
+          if (($feed_fields == ["api3s"]) and any($env.api3s[]?; ascii_downcase == ($native | ascii_downcase))) then "\($chain) env.api3s contains zero address" else empty end
+      ]
+      | .[]
+    ' "$config_file"
+  )
+
+  for chain_id in ${(f)"$(jq -r 'to_entries[] | select((.value.oracle // "") != "") | .key' "$config_file")"}; do
+    chain "$chain_id" >/dev/null
+    [[ -n "${WETH:-}" ]] || fail "$chain_id missing WETH after chain"
+
+    overlap=$(
+      jq -r --arg chain "$chain_id" --arg weth "${WETH:l}" \
+        '.[$chain].connectors // [] | .[] | select(ascii_downcase == $weth)' "$config_file"
+    )
+    if [[ -n "$overlap" ]]; then
+      [[ -z "$errors" ]] || errors+=$'\n'
+      errors+="$chain_id connectors include WNATIVE: $overlap"
+    fi
+  done
+
+  [[ -z "$errors" ]] || fail "config rule violations:\n$errors"
+}
+
+active_config_rows() {
+  jq -r '
+    def feed_type:
+      if ((.env.pyths // []) | length) > 0 then "pyth"
+      elif ((.env.ftso // []) | length) > 0 then "ftso"
+      elif ((.env.api3s // []) | length) > 0 then "api3"
+      elif ((.env.feeds // []) | length) > 0 then "chainlink"
+      else "none"
+      end;
+    def feed_count:
+      if ((.env.pyths // []) | length) > 0 then (.env.pyths | length)
+      elif ((.env.ftso // []) | length) > 0 then (.env.ftso | length)
+      elif ((.env.api3s // []) | length) > 0 then (.env.api3s | length)
+      elif ((.env.feeds // []) | length) > 0 then (.env.feeds | length)
+      else 0
+      end;
+    def adapter_labels:
+      [.adapters[]? | (.label // .env.name // .name // "unnamed")] | join(", ");
+
+    to_entries
+    | sort_by(.key | tonumber)
+    | .[]
+    | select((.value.oracle // "") != "")
+    | (.value.connectors // []) as $connectors
+    | [
+        .key,
+        (.value | feed_type),
+        (.value | feed_count),
+        (.value | adapter_labels)
+      ]
+    | @tsv
+  ' "$config_file"
+}
+
+print_config_status_table() {
+  print -- "Config Status"
+  active_config_rows | awk -F '\t' '
+    function store(c1, c2, c3, c4,   i) {
+      rows++
+      cell[rows, 1] = c1
+      cell[rows, 2] = c2
+      cell[rows, 3] = c3
+      cell[rows, 4] = c4
+      for (i = 1; i <= columns; i++) if (length(cell[rows, i]) > width[i]) width[i] = length(cell[rows, i])
+    }
+
+    function border(left, middle, right,   i, j) {
+      printf "%s", left
+      for (i = 1; i <= columns; i++) {
+        for (j = 0; j < width[i] + 2; j++) printf "─"
+        if (i == columns) {
+          printf "%s", right
+        } else {
+          printf "%s", middle
+        }
+      }
+      print ""
+    }
+
+    function print_row(row,   i) {
+      printf "│"
+      for (i = 1; i <= columns; i++) printf " %-" width[i] "s │", cell[row, i]
+      print ""
+    }
+
+    BEGIN {
+      columns = 4
+      store("Chain", "Feed", "Feeds", "Adapters")
+    }
+
+    {
+      store($1, $2, $3, $4)
+    }
+
+    END {
+      border("┌", "┬", "┐")
+      print_row(1)
+      border("├", "┼", "┤")
+      for (row = 2; row <= rows; row++) print_row(row)
+      border("└", "┴", "┘")
+    }
+  '
+}
+
 check_price() {
   local kind=$1 chain_id=$2 oracle=$3 token=$4 raw diagnostics
 
@@ -170,6 +308,7 @@ jobs() {
 
 run_all() {
   assert_static_config
+  assert_config_rules
   assert_non_base_tokens
 
   jobs | parallel --line-buffer --colsep '\t' \
@@ -187,8 +326,10 @@ case "${1:-}" in
     set -e
 
     if [[ $code -eq 0 ]]; then
+      print_config_status_table
       print -- "OK"
     else
+      print_config_status_table
       print -- "e2e failed with exit $code"
       print -r -- "$output"
       exit "$code"

@@ -1,7 +1,7 @@
 AlgebraCustomPoolOracleAvaxTest:test_blackholeClCustomPoolOracle_resolvesWavaxUsdc() (gas: 3133614)
 AlgebraCustomPoolOracleBscTest:test_thenaV3FeeOnly_resolvesPools() (gas: 140731)
 AlgebraCustomPoolOracleBscTest:test_thenaV3_resolvesPools() (gas: 134565)
-E2ETest:testUsdOracleE2E() (gas: 7566)
+E2ETest:testUsdOracleE2E() (gas: 22963)
 UsdOracleApi3Test:testEthUsd_readsApi3Value() (gas: 20266)
 UsdOracleApi3Test:testEthUsd_revertsOnStaleAnswer() (gas: 30574)
 UsdOracleApi3Test:testUsd_usesAggregatorWhenFeedIsZero() (gas: 1289607)

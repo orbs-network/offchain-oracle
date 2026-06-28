@@ -1,5 +1,16 @@
 # AGENTS.md
 
+## Spot Notion Dashboard
+
+When asked to update the Spot Notion integrations dashboard:
+
+1. Use Notion database `TWAP/Spot Integrations` with id `262312ca68a98089837bfaf4ac9ef209`.
+2. Assume `NOTION_API_KEY` is already available in the shell environment; never print secrets.
+3. This repo owns the dashboard `Oracle` column. Set it from this repo's `config.json` state only.
+4. Do not update the dashboard `Contracts` column from this repo; that column belongs to `spot` repo.
+
+## Config Invariants
+
 These are hard requirements when generating or editing `config.json`. Treat them as invariants.
 
 - The deployment scripts build the runtime token list as `tokens = [native, WNATIVE, ...connectors]` where `native` is `0x0000000000000000000000000000000000000000` and `WNATIVE` is the `WETH` env var.
