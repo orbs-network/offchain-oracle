@@ -216,7 +216,7 @@ active_config_rows() {
       else 0
       end;
     def adapter_labels:
-      [.adapters[]? | (.label // .env.name // .name // "unnamed")] | join(", ");
+      [.adapters[]? | (.label // .env.name // .name // "unnamed")[:4]] | join(", ");
 
     to_entries
     | sort_by(.key | tonumber)
