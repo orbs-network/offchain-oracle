@@ -367,23 +367,16 @@ assert_config_rules() {
   [[ -z "$errors" ]] || fail "config rule violations:\n$errors"
 }
 
-active_config_rows() {
-  local tab=$'\t' chain_id feed feed_count adapters
+config_rows() {
+  local tab=$'\t' chain_id feed_kind feed_count adapters
 
   jq -r '
-    def feed_type:
-      if ((.env.pyths // []) | length) > 0 then "pyth"
-      elif ((.env.ftso // []) | length) > 0 then "ftso"
-      elif ((.env.api3s // []) | length) > 0 then "api3"
-      elif ((.env.feeds // []) | length) > 0 then "chainlink"
-      else "none"
-      end;
-    def feed_count:
-      if ((.env.pyths // []) | length) > 0 then (.env.pyths | length)
-      elif ((.env.ftso // []) | length) > 0 then (.env.ftso | length)
-      elif ((.env.api3s // []) | length) > 0 then (.env.api3s | length)
-      elif ((.env.feeds // []) | length) > 0 then (.env.feeds | length)
-      else 0
+    def selected_feed:
+      if ((.env.pyths // []) | length) > 0 then {kind: "pyth", feeds: .env.pyths}
+      elif ((.env.ftso // []) | length) > 0 then {kind: "ftso", feeds: .env.ftso}
+      elif ((.env.api3s // []) | length) > 0 then {kind: "api3", feeds: .env.api3s}
+      elif ((.env.feeds // []) | length) > 0 then {kind: "chainlink", feeds: .env.feeds}
+      else {kind: "none", feeds: []}
       end;
     def adapter_labels:
       [.adapters[]? | (.label // .env.name // .name // "unnamed")[:4]] | join(", ");
@@ -391,17 +384,17 @@ active_config_rows() {
     to_entries
     | sort_by(.key | tonumber)
     | .[]
-    | (.value.connectors // []) as $connectors
+    | (.value | selected_feed) as $feed
     | [
         .key,
-        (.value | feed_type),
-        (.value | feed_count),
+        $feed.kind,
+        ($feed.feeds | length),
         (.value | adapter_labels)
       ]
     | @tsv
   ' "$config_file" |
-    while IFS=$'\t' read -r chain_id feed feed_count adapters; do
-      print -r -- "$(chain_name "$chain_id")${tab}${feed}${tab}${feed_count}${tab}${adapters}"
+    while IFS=$'\t' read -r chain_id feed_kind feed_count adapters; do
+      print -r -- "$(chain_name "$chain_id")${tab}${feed_kind}${tab}${feed_count}${tab}${adapters}"
     done
 }
 
@@ -414,7 +407,7 @@ chain_name() {
 
 print_config_status_table() {
   print -- "Config Status"
-  active_config_rows | awk -F '\t' '
+  config_rows | awk -F '\t' '
     function store(c1, c2, c3, c4,   i) {
       rows++
       cell[rows, 1] = c1
@@ -477,35 +470,28 @@ check_price() {
 }
 
 feed_jobs() {
-  local chain_id kind index
-  local -a feeds tokens
+  local chain_id kind feed index
+  local -a feed_rows tokens
 
   for chain_id in ${(f)"$(jq -r 'keys[]' "$config_file")"}; do
-    kind=$(
+    feed_rows=("${(@f)$(
       jq -r --arg chain "$chain_id" '
         .[$chain].env as $env
-        | if (($env.pyths // []) | length) > 0 then "pyth"
-          elif (($env.ftso // []) | length) > 0 then "ftso"
-          elif (($env.api3s // []) | length) > 0 then "api3"
-          elif (($env.feeds // []) | length) > 0 then "chainlink"
-          else "none"
-          end
-      ' "$config_file"
-    )
-    feeds=("${(@f)$(
-      jq -r --arg chain "$chain_id" '
-        .[$chain].env as $env
-        | if (($env.pyths // []) | length) > 0 then $env.pyths[]
-          elif (($env.ftso // []) | length) > 0 then $env.ftso[]
-          elif (($env.api3s // []) | length) > 0 then $env.api3s[]
-          else $env.feeds[]
-          end
+        | (if (($env.pyths // []) | length) > 0 then {kind: "pyth", feeds: $env.pyths}
+           elif (($env.ftso // []) | length) > 0 then {kind: "ftso", feeds: $env.ftso}
+           elif (($env.api3s // []) | length) > 0 then {kind: "api3", feeds: $env.api3s}
+           else {kind: "chainlink", feeds: $env.feeds}
+           end) as $feed
+        | $feed.feeds[]
+        | [$feed.kind, .]
+        | @tsv
       ' "$config_file"
     )}")
     tokens=("${(@f)$(base_assets "$chain_id")}")
 
     for ((index = 1; index <= ${#tokens}; index++)); do
-      print -r -- "$kind"$'\t'"$chain_id"$'\t'"${tokens[$index]}"$'\t'"${feeds[$index]}"
+      IFS=$'\t' read -r kind feed <<<"${feed_rows[$index]}"
+      print -r -- "$kind"$'\t'"$chain_id"$'\t'"${tokens[$index]}"$'\t'"$feed"
     done
   done
 }
