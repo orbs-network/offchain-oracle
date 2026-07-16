@@ -122,18 +122,11 @@ assert_static_config() {
     and all(to_entries[]; all(.value[]; ascii_downcase != "0x0000000000000000000000000000000000000000"))
     and all(to_entries[]; (.value | map(ascii_downcase) | unique | length) == (.value | length))
   ' "$tokens_file" >/dev/null || fail "invalid tokens fixture"
-
-  jq -e --slurpfile tokens "$tokens_file" '
-    all(
-      to_entries[] | select((.value.oracle // "") != "");
-      (.key as $chain | ($tokens[0][$chain] // []) | length >= 3)
-    )
-  ' "$config_file" >/dev/null || fail "active config chain missing 3 non-base tokens"
 }
 
 assert_non_base_tokens() {
   local chain_id tokens overlap
-  for chain_id in ${(f)"$(jq -r 'keys[]' "$tokens_file")"}; do
+  for chain_id in ${(f)"$(jq -r 'keys[]' "$config_file")"}; do
     tokens=$(jq -r --arg chain "$chain_id" '.[$chain][]' "$tokens_file" | tr '[:upper:]' '[:lower:]')
     overlap=$(
       base_assets "$chain_id" \
@@ -148,7 +141,7 @@ assert_config_rules() {
   local errors chain_id overlap
 
   errors=$(
-    jq -r --arg native "$native_token" --arg none "$none_token" '
+    jq -r --arg native "$native_token" --arg none "$none_token" --slurpfile tokens "$tokens_file" '
       def feed_keys: ["feeds", "pyths", "api3s", "ftso"];
       def feed_fields($env): [feed_keys[] as $key | select((($env[$key] // []) | length) > 0) | $key];
       def selected_feed($env):
@@ -166,10 +159,12 @@ assert_config_rules() {
         | ($cfg.connectors // []) as $connectors
         | ($cfg.env // {}) as $env
         | feed_fields($env) as $feed_fields
-        | if ($env | has("tokens")) then "\($chain) env.tokens must not be set" else empty end,
+        | if (($cfg.oracle // "") | test("^0x[cC][eE][eE]000[0-9a-fA-F]{34}$") | not) then "\($chain) missing valid deployed oracle" else empty end,
+          if ((($tokens[0][$chain] // []) | length) < 3) then "\($chain) missing 3 non-base tokens" else empty end,
+          if ($env | has("tokens")) then "\($chain) env.tokens must not be set" else empty end,
           if (($connectors | map(ascii_downcase) | unique | length) != ($connectors | length)) then "\($chain) connectors contain duplicates" else empty end,
           ($connectors[]? | select((ascii_downcase == ($native | ascii_downcase)) or (ascii_downcase == ($none | ascii_downcase))) | "\($chain) connectors include native or NONE: \(.)"),
-          if (($cfg.oracle // "") != "" and ($feed_fields | length) != 1) then "\($chain) must set exactly one env feed array" else empty end,
+          if (($feed_fields | length) != 1) then "\($chain) must set exactly one env feed array" else empty end,
           if (($feed_fields | length) > 1) then "\($chain) sets multiple env feed arrays: \($feed_fields | join(", "))" else empty end,
           if (($feed_fields | length) == 1 and ((selected_feed($env) | length) != (($connectors | length) + 2))) then "\($chain) env.\($feed_fields[0]) length \(selected_feed($env) | length) != connectors+2 \(($connectors | length) + 2)" else empty end,
           if (($feed_fields == ["pyths"]) and (($env.pyth // $native | ascii_downcase) == ($native | ascii_downcase))) then "\($chain) env.pyth must be non-zero when env.pyths is set" else empty end,
@@ -180,7 +175,7 @@ assert_config_rules() {
     ' "$config_file"
   )
 
-  for chain_id in ${(f)"$(jq -r 'to_entries[] | select((.value.oracle // "") != "") | .key' "$config_file")"}; do
+  for chain_id in ${(f)"$(jq -r 'keys[]' "$config_file")"}; do
     chain "$chain_id" >/dev/null
     [[ -n "${WETH:-}" ]] || fail "$chain_id missing WETH after chain"
 
@@ -221,7 +216,6 @@ active_config_rows() {
     to_entries
     | sort_by(.key | tonumber)
     | .[]
-    | select((.value.oracle // "") != "")
     | (.value.connectors // []) as $connectors
     | [
         .key,
@@ -308,7 +302,7 @@ check_price() {
 }
 
 jobs() {
-  jq -r 'to_entries[] | select((.value.oracle // "") != "") | [.key, .value.oracle] | @tsv' "$config_file" \
+  jq -r 'to_entries[] | [.key, .value.oracle] | @tsv' "$config_file" \
     | while IFS=$'\t' read -r chain_id oracle; do
         base_assets "$chain_id" | while read -r token; do
           print -- "base\t$chain_id\t$oracle\t$token"
