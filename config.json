@@ -1566,6 +1566,39 @@
                     ],
                     "address": "0x44D38A6930FBC50f3E90F8249CA602781b2995b6"
                 }
+            },
+            {
+                "label": "ThrusterV3",
+                "name": "UniswapV3LikeOracle",
+                "env": {
+                    "factory": "0xa08ae3d3f4dA51C22d3c041E468bdF4C61405AaB",
+                    "initcodehash": "0xd0c3a51b16dbc778f000c620eaabeecd33b33a80bd145e1f7cbc0d4de335193d",
+                    "fees": [
+                        100,
+                        500,
+                        3000,
+                        10000
+                    ],
+                    "address": "0x937a002dd50452ffeb4f9c690556043a67b132B5"
+                }
+            },
+            {
+                "label": "ThrusterV2",
+                "name": "UniswapV2LikeOracle",
+                "env": {
+                    "factory": "0xb4A7D971D0ADea1c73198C97d7ab3f9CE4aaFA13",
+                    "initcodehash": "0x6f0346418750a1a53597a51ceff4f294b5f0e87f09715525b519d38ad3fab2cb",
+                    "address": "0x1c5361ba8EFE172E6D809839B3EcE9eE8F47cf5D"
+                }
+            },
+            {
+                "label": "ThrusterV2-1%",
+                "name": "UniswapV2LikeOracle",
+                "env": {
+                    "factory": "0x37836821a2c03c171fB1a595767f4a16e2b93Fc4",
+                    "initcodehash": "0x32a9ff5a51b653cbafe88e38c4da86b859135750d3ca435f0ce732c8e3bb8335",
+                    "address": "0xf5EE31c73Bbb2ecb4241B3E260cd3B2b4388E5bd"
+                }
             }
         ],
         "aggregatorSalt": "0xf54bbe184fec3174b5f35589f0712f4819de473e30455ee8f0efd194e8c09f8b",
@@ -1592,41 +1625,41 @@
                 "name": "UniswapV2LikeOracle",
                 "env": {
                     "factory": "0x458C5d5B75ccBA22651D2C5b61cB1EA1e0b0f95D",
-                    "initcodehash": "0xdb6150d8b7486220fb4136e079799d4c56bc5faffe4f942831eba66486f3262b"
+                    "initcodehash": "0xdb6150d8b7486220fb4136e079799d4c56bc5faffe4f942831eba66486f3262b",
+                    "address": "0xD13609A8ace04D11Ea2FFE176B69dF77C6d9375E"
                 }
-            }
-        ]
-    },
-    "4217": {
-        "connectors": [
-            "0x20c00000000000000000000014f22ca97301eb73",
-            "0x20c000000000000000000000b9537d11c60e8b50"
-        ],
-        "adapters": [
+            },
             {
-                "label": "UniswapV3",
+                "label": "VelodromeV3",
                 "name": "UniswapV3LikeOracle",
                 "env": {
-                    "factory": "0x24a3d4757e330890a8b8978028c9e58e04611fd6",
-                    "initcodehash": "0xe34f199b19b2b4f47f68442619d555527d244f78a3297ea89325f843f87b8b54",
+                    "factory": "0x04625B046C69577EfC40e6c0Bb83CDBAfab5a55F",
+                    "initcodehash": "0x7b216153c50849f664871825fa6f22b3356cdce2436e4f48734ae2a926a4c7e5",
                     "fees": [
+                        1,
+                        10,
+                        50,
                         100,
-                        500,
-                        3000,
-                        10000
-                    ]
+                        200,
+                        2000
+                    ],
+                    "address": "0x72a18A408e329E7052d08aA0746243Dc30Ad2530"
                 }
             }
-        ]
+        ],
+        "aggregatorSalt": "0xb8a2d9abb33e86d1831675bd686561e6f21c2b83754fbcbeca396d81ba9ab6a4",
+        "aggregator": "0x111111099d9a3E7E28f5b57C3e888fe18cbA1A63",
+        "salt": "0x99c03264bfb1655850d9c793ddedb7629897e91d787e62e6372c275654beac08",
+        "oracle": "0xCEe000CA6a54AF7930568Da926f1CD78E374F258"
     },
     "30": {
         "env": {
             "feeds": [
-                "0xd1dd9396946F45b5C03A247DB1703798a365eAe3",
-                "0xd1dd9396946F45b5C03A247DB1703798a365eAe3",
-                "0xDa3ca96a5cBECe75008457398222c5Ea860d876B",
-                "0xb3eDFBa057eef8F479E08d637dbd615561a07390",
-                "0x91BC8A0E735cf4BBC5A1bD0CACFdFf5142FFFA91"
+                "0x197225B3B017eb9b72Ac356D6B3c267d0c04c57c",
+                "0x197225B3B017eb9b72Ac356D6B3c267d0c04c57c",
+                "0x09639692CE6ff12A06CA3AE9A24b3Aae4CD80DC8",
+                "0x3401DAF2b1f150Ef0c709Cc0283b5F2e55c3DF29",
+                "0xbbF121624c3b85C929Ac83872bf6c86b0976A55e"
             ]
         },
         "connectors": [
@@ -1645,27 +1678,29 @@
                         500,
                         3000,
                         10000
-                    ]
+                    ],
+                    "address": "0xD13609A8ace04D11Ea2FFE176B69dF77C6d9375E"
                 }
-            }
-        ]
-    },
-    "122": {
-        "connectors": [
-            "0x620fd5fa44BE6af63715Ef4E65DDFA0387aD13F5",
-            "0xfadbbf8ce7d5b7041be672561bba99f79c532e10",
-            "0x2f6f07cdcf3588944bf4c42ac74ff24bf56e7590",
-            "0x33284f95ccb7b948d9d352e1439561cf83d8d00d"
-        ],
-        "adapters": [
+            },
             {
-                "label": "Voltage",
-                "name": "UniswapV2LikeOracle",
+                "label": "UniswapV3",
+                "name": "UniswapV3LikeOracle",
                 "env": {
-                    "factory": "0x1998E4b0F1F922367d8Ec20600ea2b86df55f34E",
-                    "initcodehash": "0xe5f5532292e2e2a7aee3c2bb13e6d26dca6e8cc0a843ddd6f37c436c23cfab22"
+                    "factory": "0xaF37EC98A00FD63689CF3060BF3B6784E00caD82",
+                    "initcodehash": "0xe34f199b19b2b4f47f68442619d555527d244f78a3297ea89325f843f87b8b54",
+                    "fees": [
+                        100,
+                        500,
+                        3000,
+                        10000
+                    ],
+                    "address": "0x72a18A408e329E7052d08aA0746243Dc30Ad2530"
                 }
             }
-        ]
+        ],
+        "aggregatorSalt": "0xce19e3381686b9f67536ae36962574ed3d9926a252bb9b7e34ad9c5ee456902c",
+        "aggregator": "0x1111119d65AEDB266C4Cb86A71D0544aa198A1CA",
+        "salt": "0x77ba0d50e8782f6801566ba2b61dfc426c3d871c8a4e538bdc283cc0c99166b0",
+        "oracle": "0xcEe0001409CA6Dd38044D33f25131157695bF24F"
     }
 }
