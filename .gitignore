@@ -16,3 +16,4 @@ solcInputs
 *.log
 deployments/hardhat
 .worktrees/
+docs/superpowers/
