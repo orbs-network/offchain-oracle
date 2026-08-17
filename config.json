@@ -1658,13 +1658,11 @@
                 "0x197225B3B017eb9b72Ac356D6B3c267d0c04c57c",
                 "0x197225B3B017eb9b72Ac356D6B3c267d0c04c57c",
                 "0x09639692CE6ff12A06CA3AE9A24b3Aae4CD80DC8",
-                "0x3401DAF2b1f150Ef0c709Cc0283b5F2e55c3DF29",
                 "0xbbF121624c3b85C929Ac83872bf6c86b0976A55e"
             ]
         },
         "connectors": [
             "0x779dED0C9e1022225F8e0630b35A9B54Be713736",
-            "0x2F6F07CDcf3588944Bf4C42aC74ff24bF56e7590",
             "0x2acc95758f8b5f583470ba265eb685a8f45fc9d5"
         ],
         "adapters": [
@@ -1700,8 +1698,8 @@
         ],
         "aggregatorSalt": "0xce19e3381686b9f67536ae36962574ed3d9926a252bb9b7e34ad9c5ee456902c",
         "aggregator": "0x1111119d65AEDB266C4Cb86A71D0544aa198A1CA",
-        "salt": "0x77ba0d50e8782f6801566ba2b61dfc426c3d871c8a4e538bdc283cc0c99166b0",
-        "oracle": "0xcEe0001409CA6Dd38044D33f25131157695bF24F"
+        "salt": "0x1ed9c27728ab6991fc6526827ee5e8199ef2fd671655a245926ce769a06980c7",
+        "oracle": "0xceE000619bb226B7ba4ccec7D454BD1290a6CC32"
     },
     "4663": {
         "env": {
