@@ -520,19 +520,15 @@
             "pyths": [
                 "0x962088abcfdbdb6e30db2e340c8cf887d9efb311b1f2f17b155a63dbb6d40265",
                 "0x962088abcfdbdb6e30db2e340c8cf887d9efb311b1f2f17b155a63dbb6d40265",
-                "0xf67b033925d73d43ba4401e00308d9b0f26ab4fbd1250e8b5407b9eaade7e1f4",
                 "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a",
                 "0x2b89b9dc8fdf9f34709a5b106b472f0f39bb6ca9ce04b0fd7f2e971688e2e53b",
-                "0x6ec879b1e9963de5ee97e9c8710b742d6228252a5e2ca12d4ae81d7fe5ee8c5d",
                 "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace",
                 "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43"
             ]
         },
         "connectors": [
-            "0xFCBD14DC51f0A4d49d5E53C2E0950e0bC26d0Dce",
             "0x549943e04f40284185054145c6E4e9568C1D3241",
             "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
-            "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
             "0x2F6F07CDcf3588944Bf4C42aC74ff24bF56e7590",
             "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c"
         ],
@@ -564,8 +560,8 @@
         ],
         "aggregatorSalt": "0xfe7487b4a52190a76a88ecab7c6d66fc62f1a3f7c43c1bd3baafa19da188714f",
         "aggregator": "0x11111150b59F2753F21ac86A75766a07F638B33f",
-        "salt": "0xd2df873a472da21846de05ffccde06f8eecd96c4bdd2c8b518240c20ea49f502",
-        "oracle": "0xcEe00040DCA089e74689d25Db2c02bc1c87Fa532"
+        "salt": "0x69fc347915a0386e67140eee3ca623c7c438b2b5499aacf789da7bc71562a322",
+        "oracle": "0xCEe0002CD562a4d6c2C5bb1dBC2FbFcC7F04CdfA"
     },
     "146": {
         "env": {
@@ -1336,13 +1332,15 @@
                 "0x4Ff345b18a2bF894F8627F41501FBf30d5C5e7BE",
                 "0x8b85b50535551F8E8cDAF78dA235b5Cf1005907b",
                 "0xB8a08c178D96C315FbFB5661ABD208477391BC40",
-                "0xb928a0678352005a2e51F614efD0b54C9830dB80"
+                "0xb928a0678352005a2e51F614efD0b54C9830dB80",
+                "0xF959E1B5cA535C28aD24F7f672Bf1A93900810cF"
             ]
         },
         "connectors": [
             "0xE7B000003A45145decf8a28FC755aD5eC5EA025A",
             "0x74b7F16337b8972027F6196A17a631aC6dE26d22",
-            "0x779Ded0c9e1022225f8E0630b35a9b54bE713736"
+            "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
+            "0x505000008de8748dbd4422ff4687a4fc9beba15b"
         ],
         "adapters": [
             {
@@ -1383,8 +1381,8 @@
         ],
         "aggregatorSalt": "0xfb50e75916c64e4c3ffc06fadaaccfe543b5a2e301a9ea97864979d7aac3e200",
         "aggregator": "0x111111aba047B0f354A8De82F37A0E7c6fB9597E",
-        "salt": "0x30cc6131f87925f86fe53b6e70ea0c6cb18bf301b54724d36b2f6e346f0a45cf",
-        "oracle": "0xCee000faF68884d540d640a886BB23A9a7ea8352"
+        "salt": "0x1d3270b88181ec18363f9434f5d0a89881de6f6e3e31f460462ebc95af9915dc",
+        "oracle": "0xcEe000d415886B55234BF39C648eE8Eb69c931c0"
     },
     "4326": {
         "env": {
@@ -1451,11 +1449,13 @@
             "feeds": [
                 "0xF932477C37715aE6657Ab884414Bd9876FE3f750",
                 "0xF932477C37715aE6657Ab884414Bd9876FE3f750",
-                "0x70b77FcdbE2293423e41AdD2FB599808396807BC"
+                "0x70b77FcdbE2293423e41AdD2FB599808396807BC",
+                "0x0ca32ed285ADDf84E8491f5EDB835E10635945A2"
             ]
         },
         "connectors": [
-            "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb"
+            "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb",
+            "0x211cc4dd073734da055fbf44a2b4667d5e5fe5d2"
         ],
         "adapters": [
             {
@@ -1476,21 +1476,18 @@
         ],
         "aggregatorSalt": "0xfcbf10fc8c19408f58fcce26301c819652aa2c14ace40506e0102d2906624752",
         "aggregator": "0x111111487C56e9b785F780729bb3B2dC0a43cd87",
-        "salt": "0x8656611b3c861ab20177b97009a4709b7c48eb513ee16320d9f4546aa8e07133",
-        "oracle": "0xCEE0006da7A425b98a1a6B5a9ECa533f7336B96D"
+        "salt": "0xf70c883a459724f3bcb9b08a65f4dbb297e09df8b42ba8feb8918efc0a5306b5",
+        "oracle": "0xcEE000d38C288E960dcAb77D992632198Be31EAE"
     },
     "81457": {
         "env": {
             "pyth": "0xA2aa501b19aff244D90cc15a4Cf739D2725B5729",
             "pyths": [
                 "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace",
-                "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace",
-                "0x057345a7e9ef0f36dca8ad1c4e5788808b85f3084cc7b0d8cb29ac5012d88f0d"
+                "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace"
             ]
         },
-        "connectors": [
-            "0xb1a5700fA2358173Fe465e6eA4Ff52E36e88E2ad"
-        ],
+        "connectors": [],
         "adapters": [
             {
                 "label": "UniswapV3",
@@ -1563,8 +1560,8 @@
         ],
         "aggregatorSalt": "0xf54bbe184fec3174b5f35589f0712f4819de473e30455ee8f0efd194e8c09f8b",
         "aggregator": "0x111111Fe08B676f1b1d062c3431E23ba6F077ce8",
-        "salt": "0x0b78e1330fbf18312a7d10196b182e3e134f7dadd9d604324967c1b4ce907cf2",
-        "oracle": "0xcEe00081093518F05815E7DCe65b0dDfbf69e69e"
+        "salt": "0x93c7d009c79b4b06873111b8ccd9f20e5fe6d0878e3ec4f69917d61d3864aa19",
+        "oracle": "0xceE00016742365D2914966C69bcc15F69808030E"
     },
     "57073": {
         "env": {

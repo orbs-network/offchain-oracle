@@ -28,6 +28,7 @@ canonical_symbol() {
     USDT0) symbol=USDT ;;
     WETH|UETH|VBETH|XETH) symbol=ETH ;;
     WBTC|VBWBTC|BTCB) symbol=BTC ;;
+    XSOL) symbol=SOL ;;
     VBUSDC) symbol=USDC ;;
     VBUSDT) symbol=USDT ;;
     WPOL) symbol=MATIC ;;
@@ -183,6 +184,7 @@ assert_metadata_helpers() {
   [[ "$(canonical_symbol 'WETH.e')" == ETH ]] || fail "canonical WETH.e"
   [[ "$(canonical_symbol WPOL)" == MATIC ]] || fail "canonical WPOL"
   [[ "$(canonical_symbol WRBTC)" == BTC ]] || fail "canonical WRBTC"
+  [[ "$(canonical_symbol xSOL)" == SOL ]] || fail "canonical xSOL"
   [[ "$(pair_from_metadata 'ETH / USD')" == $'ETH\tUSD' ]] || fail "pair ETH / USD"
   [[ "$(pair_from_metadata 'RedStone Price Feed for BTC')" == $'BTC\tUSD' ]] || fail "pair RedStone BTC"
   [[ "$(pair_from_metadata 'USDM-USD (USDtb Underlying)')" == $'USDM\tUSD' ]] || fail "pair USDM-USD"
