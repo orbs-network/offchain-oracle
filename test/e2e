@@ -118,7 +118,7 @@ provider_pair() {
       metadata=$(
         jq -er --arg id "${hex:l}" '
           map(select((.id | ascii_downcase) == $id))
-          | if length == 1 then .[0].attributes.display_symbol
+          | if length == 1 then .[0].attributes.symbol | sub("^[^.]+\\."; "")
             else error("Pyth feed id must match exactly once")
             end
         ' "$PYTH_CATALOG_FILE" 2>/dev/null
@@ -167,8 +167,8 @@ prepare_pyth_catalog() {
       and (.id | type) == "string"
       and (.id | length) > 0
       and (.attributes | type) == "object"
-      and (.attributes.display_symbol | type) == "string"
-      and (.attributes.display_symbol | length) > 0
+      and (.attributes.symbol | type) == "string"
+      and (.attributes.symbol | length) > 0
     )
   ' "$catalog" >/dev/null || {
     rm -f -- "$catalog"
