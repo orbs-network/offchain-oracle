@@ -9,3 +9,6 @@ remappings = [
     "@openzeppelin/=lib/openzeppelin-contracts/",
     "forge-std/=lib/forge-std/src/"
 ]
+
+[fmt]
+ignore = ["contracts/view/AggregatorLib.sol"]
