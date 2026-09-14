@@ -133,6 +133,55 @@ provider_pair() {
   pair_from_metadata "$metadata"
 }
 
+feed_timestamp() {
+  local kind=$1 chain_id=$2 token=$3 feed=$4 oracle deployed_feed provider raw
+
+  oracle=$(jq -er --arg chain "$chain_id" '.[$chain].oracle' "$config_file") || return 1
+  case "$kind" in
+    chainlink)
+      deployed_feed=$(cast call "$oracle" 'usdFeed(address)(address)' "$token" 2>/dev/null) || return 1
+      raw=$(cast call --json "$feed" 'latestRoundData()(uint80,int256,uint256,uint256,uint80)' 2>/dev/null) || return 1
+      ;;
+    api3)
+      deployed_feed=$(cast call "$oracle" 'api3Feed(address)(address)' "$token" 2>/dev/null) || return 1
+      raw=$(cast call --json "$feed" 'read()(int224,uint32)' 2>/dev/null) || return 1
+      ;;
+    pyth)
+      deployed_feed=$(cast call "$oracle" 'feed(address)(bytes32)' "$token" 2>/dev/null) || return 1
+      provider=$(cast call "$oracle" 'pyth()(address)' 2>/dev/null) || return 1
+      raw=$(cast call --json "$provider" 'getPriceUnsafe(bytes32)((int64,uint64,int32,uint256))' "$feed" 2>/dev/null) || return 1
+      ;;
+    ftso)
+      feed=${feed[1,44]}
+      deployed_feed=$(cast call "$oracle" 'feed(address)(bytes21)' "$token" 2>/dev/null) || return 1
+      provider=$(cast call "$oracle" 'FTSO_V2()(address)' 2>/dev/null) || return 1
+      raw=$(cast call --json "$provider" 'getFeedById(bytes21)(uint256,int8,uint64)' "$feed" 2>/dev/null) || return 1
+      ;;
+    *) return 1 ;;
+  esac
+  [[ "${deployed_feed:l}" == "${feed:l}" ]] || return 1
+  jq -er --arg kind "$kind" '
+    (if $kind == "chainlink" then .[3]
+     elif $kind == "api3" then .[1]
+     elif $kind == "pyth" then .[0][3]
+     else .[2] end) | tostring
+  ' <<<"$raw"
+}
+
+assert_freshness() {
+  local label=$1 base=$2 updated=$3 now=$4 max_age=300 age
+
+  # Yield-bearing USD assets (for example sUSDe) are not dollar pegs.
+  case "$base" in
+    USDC|USDT|DAI|USDE|AUSD|USDM|USDG) max_age=86400 ;;
+  esac
+  [[ "$updated" == <-> && ${#updated} -le 10 && "$updated" -gt 0 ]] \
+    || fail "$label invalid publish timestamp: $updated"
+  (( updated <= now )) || fail "$label future publish timestamp: $updated (now $now)"
+  age=$((now - updated))
+  (( age < max_age )) || fail "$label stale: age ${age}s >= ${max_age}s (published $updated)"
+}
+
 prepare_pyth_catalog() {
   local catalog pyth_api_key=${PYTH_API_KEY:-} auth_config
 
@@ -499,7 +548,7 @@ feed_jobs() {
 }
 
 check_feed() {
-  local kind=$1 chain_id=$2 token=$3 feed=$4 symbol_token token_symbol token_base pair feed_base quote
+  local kind=$1 chain_id=$2 token=$3 feed=$4 symbol_token token_symbol token_base pair feed_base quote updated
 
   chain "$chain_id" >/dev/null
   [[ -n "${ETH_RPC_URL:-}" ]] || fail "$chain_id missing ETH_RPC_URL after chain"
@@ -518,6 +567,10 @@ check_feed() {
     || fail "feed mismatch: chain $chain_id token $token_symbol provider $kind feed $feed pair $feed_base/$quote, expected USD quote"
   [[ "$token_base" == "$feed_base" ]] \
     || fail "feed mismatch: chain $chain_id token $token_symbol provider $kind feed $feed pair $feed_base/$quote, expected $token_base/USD"
+
+  updated=$(feed_timestamp "$kind" "$chain_id" "$token" "$feed") \
+    || fail "$chain_id $token_symbol unable to read deployed $kind feed timestamp or feed differs from config ($feed)"
+  assert_freshness "$chain_id $token_symbol $kind feed $feed" "$token_base" "$updated" "$(date +%s)"
 
   print -r -- "ok"$'\t'"feed"$'\t'"$kind"$'\t'"$chain_id"$'\t'"$token_symbol"$'\t'"$feed"$'\t'"$feed_base/$quote"
 }

@@ -24,3 +24,12 @@ Do not set `env.tokens`.
 ```sh
 forge test
 ```
+
+E2E verifies deployed feed mappings and publication timestamps for Chainlink,
+API3, Pyth, and FTSO before checking USD quotes. Non-USD-pegged assets must have
+updates less than five minutes old. USD pegs (USDC, USDT, DAI, USDe, AUSD, USDm,
+and USDG, including recognized bridged variants) must have updates less than one
+day old. Yield-bearing assets such as sUSDe use the five-minute limit. Missing,
+zero, or future timestamps fail. Age is measured against current wall-clock time.
+
+These checks do not refresh feeds or relax the deployed oracle's freshness rules.
