@@ -1,6 +1,6 @@
 AlgebraCustomPoolOracleBscTest:test_thenaV3FeeOnly_resolvesPools() (gas: 154231)
 AlgebraCustomPoolOracleBscTest:test_thenaV3_resolvesPools() (gas: 146065)
-E2ETest:testUsdOracleE2E() (gas: 21474)
+E2ETest:testUsdOracleE2E() (gas: 22030)
 UsdOracleApi3Test:testEthUsd_readsApi3Value() (gas: 20266)
 UsdOraclePythTest:testEthUsd_scalesTo1e18() (gas: 25044)
 UsdOracleTest:testEthUsd_revertsOnStaleAnswer() (gas: 66055)
