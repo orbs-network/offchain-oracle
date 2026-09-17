@@ -410,12 +410,13 @@ chain_name() {
 print_config_status_table() {
   print -- "Config Status"
   config_rows | awk -F '\t' '
-    function store(c1, c2, c3, c4,   i) {
+    function store(c1, c2, c3, c4, c5,   i) {
       rows++
       cell[rows, 1] = c1
       cell[rows, 2] = c2
       cell[rows, 3] = c3
       cell[rows, 4] = c4
+      cell[rows, 5] = c5
       for (i = 1; i <= columns; i++) if (length(cell[rows, i]) > width[i]) width[i] = length(cell[rows, i])
     }
 
@@ -439,12 +440,12 @@ print_config_status_table() {
     }
 
     BEGIN {
-      columns = 4
-      store("Chain", "Feed", "Feeds", "Adapters")
+      columns = 5
+      store("#", "Chain", "Feed", "Feeds", "Adapters")
     }
 
     {
-      store($1, $2, $3, $4)
+      store(NR, $1, $2, $3, $4)
     }
 
     END {
