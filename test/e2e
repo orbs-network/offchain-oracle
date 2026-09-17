@@ -38,7 +38,6 @@ canonical_symbol() {
     WMON) symbol=MON ;;
     WHYPE) symbol=HYPE ;;
     WS) symbol=S ;;
-    WHBAR) symbol=HBAR ;;
     WXPL) symbol=XPL ;;
     RBTC|WRBTC) symbol=BTC ;;
     WBERA) symbol=BERA ;;
@@ -408,8 +407,13 @@ chain_name() {
 }
 
 print_config_status_table() {
-  print -- "Offchain Oracle Config Status"
+  print -- "🔮 Offchain Oracle Config Status"
   config_rows | awk -F '\t' '
+    function display_width(value) {
+      gsub(/🌐|📡|🔢|🔌/, "xx", value)
+      return length(value)
+    }
+
     function store(c1, c2, c3, c4, c5,   i) {
       rows++
       cell[rows, 1] = c1
@@ -417,7 +421,7 @@ print_config_status_table() {
       cell[rows, 3] = c3
       cell[rows, 4] = c4
       cell[rows, 5] = c5
-      for (i = 1; i <= columns; i++) if (length(cell[rows, i]) > width[i]) width[i] = length(cell[rows, i])
+      for (i = 1; i <= columns; i++) if (display_width(cell[rows, i]) > width[i]) width[i] = display_width(cell[rows, i])
     }
 
     function border(left, middle, right,   i, j) {
@@ -435,13 +439,13 @@ print_config_status_table() {
 
     function print_row(row,   i) {
       printf "│"
-      for (i = 1; i <= columns; i++) printf " %-" width[i] "s │", cell[row, i]
+      for (i = 1; i <= columns; i++) printf " %s%*s │", cell[row, i], width[i] - display_width(cell[row, i]), ""
       print ""
     }
 
     BEGIN {
       columns = 5
-      store("#", "Chain", "Feed", "Feeds", "Adapters")
+      store("#", "🌐 Chain", "📡 Feed", "🔢 Feeds", "🔌 Adapters")
     }
 
     {

@@ -1417,33 +1417,6 @@
         "salt": "0x60a8460536b79cfe58ea174fcd8eec386624c412c5303446a15331a143cfcb2c",
         "oracle": "0xCEE000D5ADd559f7910c496369085dBc220acEb3"
     },
-    "295": {
-        "env": {
-            "feeds": [
-                "0xAF685FB45C12b92b5054ccb9313e135525F9b5d5",
-                "0xAF685FB45C12b92b5054ccb9313e135525F9b5d5",
-                "0x2b358642c7C37b6e400911e4FE41770424a7349F"
-            ]
-        },
-        "connectors": [
-            "0x000000000000000000000000000000000006f89a"
-        ],
-        "adapters": [
-            {
-                "label": "SaucerSwap",
-                "name": "UniswapV2LikeOracle",
-                "env": {
-                    "factory": "0x0000000000000000000000000000000000103780",
-                    "initcodehash": "0x407b3b02625070246aa1a1a346747a190d54149fc468122d6934af99b6ad0e6a",
-                    "address": "0xeFE1B6096838949156e5130604434A2a13c68C68"
-                }
-            }
-        ],
-        "aggregatorSalt": "0xc4a857472d0a0fad3b35f6b7764b0ce317f7a9834c8e5468b667020ed881ac16",
-        "aggregator": "0x1111119F134a642237f4B7e990B0BAf4493680cc",
-        "salt": "0xb5a7f46866738474ef330b3d3c611bae207525709333a39675d9d45ab2892e60",
-        "oracle": "0xceE0000aC59551F55d8d8927CE062ad5D7397abD"
-    },
     "9745": {
         "env": {
             "feeds": [
