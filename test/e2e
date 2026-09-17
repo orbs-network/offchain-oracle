@@ -408,7 +408,7 @@ chain_name() {
 }
 
 print_config_status_table() {
-  print -- "Config Status"
+  print -- "Offchain Oracle Config Status"
   config_rows | awk -F '\t' '
     function store(c1, c2, c3, c4, c5,   i) {
       rows++
