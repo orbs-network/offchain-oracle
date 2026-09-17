@@ -534,6 +534,32 @@ jobs() {
       done
 }
 
+check_deployment() {
+  local chain_id=$1 oracle aggregator field address code bound registered
+  chain "$chain_id" >/dev/null
+  while IFS=$'\t' read -r field address; do
+    [[ "$address" =~ ^0x[[:xdigit:]]{40}$ && "$address" != "$native_token" ]] \
+      || fail "$chain_id invalid $field address: $address"
+    code=$(cast code "$address" --rpc-timeout 15 2>/dev/null) \
+      || fail "$chain_id $field bytecode RPC failure"
+    [[ -n "$code" && "$code" != 0x ]] || fail "$chain_id $field missing bytecode: $address"
+  done < <(jq -r --arg id "$chain_id" '.[$id] | (["oracle", (.oracle // "-")], ["aggregator", (.aggregator // "-")], (.adapters[]? | [(.label // .name), (.env.address // "-")])) | @tsv' "$config_file")
+  oracle=$(jq -r --arg id "$chain_id" '.[$id].oracle' "$config_file")
+  aggregator=$(jq -r --arg id "$chain_id" '.[$id].aggregator' "$config_file")
+  bound=$(cast call "$oracle" 'aggregator()(address)' --rpc-timeout 15 2>/dev/null) \
+    || fail "$chain_id aggregator binding RPC failure"
+  [[ ${bound:l} == ${aggregator:l} ]] || fail "$chain_id aggregator binding mismatch"
+  registered=$(cast call "$aggregator" 'oracles()(address[],uint8[])' --json --rpc-timeout 15 2>/dev/null) \
+    || fail "$chain_id adapter registration RPC failure"
+  jq -e --arg id "$chain_id" '.[$id].adapters | length > 0' "$config_file" >/dev/null \
+    || fail "$chain_id no oracle adapters configured"
+  while IFS= read -r address; do
+    print -r -- "$registered" | jq -e --arg addr "${address:l}" '.[0] | type == "array" and any(.[]; ascii_downcase == $addr)' >/dev/null \
+      || fail "$chain_id adapter not registered: $address"
+  done < <(jq -r --arg id "$chain_id" '.[$id].adapters[].env.address' "$config_file")
+  print -- "ok\tdeployment\t$chain_id"
+}
+
 run_all() {
   local pyth_catalog=
 
@@ -542,6 +568,8 @@ run_all() {
     assert_static_config
     assert_config_rules
     assert_non_base_tokens
+
+    jq -r 'keys[]' "$config_file" | parallel --line-buffer "$script_path --deployment {}" || return $?
 
     pyth_catalog=$(prepare_pyth_catalog)
     export PYTH_CATALOG_FILE=$pyth_catalog
@@ -557,6 +585,9 @@ run_all() {
 }
 
 case "${1:-}" in
+  --deployment)
+    check_deployment "$2"
+    ;;
   --feed)
     check_feed "$2" "$3" "$4" "$5"
     ;;
