@@ -403,7 +403,6 @@ chain_name() {
 
 print_config_status_table() {
   local chain_id feed_kind feed_count adapters
-  [[ ${ORACLE_HIDE_CONFIG_TABLE:-0} != 1 ]] || return 0
   print -- "🔮 Offchain Oracle Config Status"
   config_rows | while IFS=$'\t' read -r chain_id feed_kind feed_count adapters; do
     printf '%s\t%s\t%s\t%s\n' "$(chain_name "$chain_id")" "$feed_kind" "$feed_count" "$adapters"
